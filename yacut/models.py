@@ -1,10 +1,11 @@
 from datetime import datetime
 
+from yacut.constants import MAX_URL_LENTH, MAX_CUSTOM_ID_LENGTH
 from yacut import db
 
 
 class URLMap(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    original = db.Column(db.String(256), nullable=False)
-    short = db.Column(db.String(128), nullable=False)
+    original = db.Column(db.String(MAX_URL_LENTH), nullable=False)
+    short = db.Column(db.String(MAX_CUSTOM_ID_LENGTH), nullable=False)
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
