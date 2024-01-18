@@ -1,8 +1,8 @@
 from flask_wtf import FlaskForm
-from wtforms import URLField, SubmitField
-from wtforms.validators import DataRequired, Length, URL
+from wtforms import SubmitField, URLField
+from wtforms.validators import URL, DataRequired, Length, Regexp
 
-from yacut.constants import MAX_URL_LENTH, MAX_CUSTOM_ID_LENGTH
+from yacut.constants import MAX_CUSTOM_ID_LENGTH, MAX_URL_LENTH
 
 
 class URLForm(FlaskForm):
@@ -21,6 +21,10 @@ class URLForm(FlaskForm):
             Length(
                 max=MAX_CUSTOM_ID_LENGTH,
                 message='Длина ссылки не может превышать %(max)d символов.'
+            ),
+            Regexp(
+                regex='^$|[0-9A-Za-z]',
+                message='Можно использовать только цифры и буквы латинского алфавита.'
             )
         ])
     submit = SubmitField('Создать')

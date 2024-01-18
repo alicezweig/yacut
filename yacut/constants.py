@@ -1,2 +1,3 @@
 MAX_URL_LENTH = 2048
 MAX_CUSTOM_ID_LENGTH = 16
+YACUT_URL = 'http://yacut.ru/'
