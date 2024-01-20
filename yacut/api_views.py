@@ -2,6 +2,7 @@ from flask import jsonify, request
 from marshmallow import ValidationError
 
 from yacut import app, db
+from yacut.constants import YACUT_URL
 from yacut.models import URLMap
 from yacut.schemas import URLMapSchema
 from yacut.create_short import create_short
@@ -30,5 +31,8 @@ def add_custom_id():
         return jsonify({'message': 'Предложенный вариант короткой ссылки уже существует.'}), 400
     db.session.add(result)
     db.session.commit()
-    response = schema.dump(result)
+    response = {
+        'url': data['url'],
+        'short_link': YACUT_URL + data['custom_id']
+    }
     return jsonify(response), 201
