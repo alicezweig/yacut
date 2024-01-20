@@ -11,16 +11,16 @@ from yacut.models import URLMap
 def index():
     form = URLForm()
     if form.validate_on_submit():
-        original = form.url.data
-        short = form.custom_id.data
-        if db.session.query(URLMap).filter_by(short=short).scalar():
+        url = form.url.data
+        custom_id = form.custom_id.data
+        if db.session.query(URLMap).filter_by(custom_id=custom_id).scalar():
             flash('Такая короткая ссылка уже занята.')
             flash('Введите другое значение или оставьте поле пустым, \
                   чтобы сервис сгенерировал ссылку автоматически.')
             return render_template('index.html', form=form)
-        if not short:
-            short = create_short()
-        db.session.add(URLMap(original=original, short=short))
+        if not custom_id:
+            custom_id = create_short()
+        db.session.add(URLMap(url=url, custom_id=custom_id))
         db.session.commit()
-        flash(f'Ваша короткая ссылка: {YACUT_URL}{short}')
+        flash(f'Ваша короткая ссылка: {YACUT_URL}{custom_id}')
     return render_template('index.html', form=form)
