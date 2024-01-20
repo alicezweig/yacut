@@ -4,6 +4,7 @@ from marshmallow import ValidationError
 from yacut import app, db
 from yacut.models import URLMap
 from yacut.schemas import URLMapSchema
+from yacut.create_short import create_short
 
 
 @app.route('/api/id/<custom_id>/', methods=['GET'])
@@ -17,13 +18,17 @@ def get_original_url(custom_id):
 @app.route('/api/id/', methods=['POST'])
 def add_custom_id():
     schema = URLMapSchema()
+    data = request.get_json()
+    custom_id = data.get('custom_id')
+    if not custom_id:
+        data['custom_id'] = create_short()
     try:
-        result = schema.load(request.get_json())
+        result = schema.load(data)
     except ValidationError as error:
-        response = {'message': list(*error.messages.values()).pop()}
-    else:
-
-        db.session.add(result)
-        db.session.commit()
-        response = schema.dump(result)
+        return jsonify({'message': list(*error.messages.values()).pop()}), 400
+    if db.session.query(URLMap).filter_by(custom_id=custom_id).scalar():
+        return jsonify({'message': 'Предложенный вариант короткой ссылки уже существует.'}), 400
+    db.session.add(result)
+    db.session.commit()
+    response = schema.dump(result)
     return jsonify(response), 201

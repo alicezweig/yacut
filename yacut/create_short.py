@@ -10,6 +10,6 @@ def create_short():
     custom_id = ''.join(
         choices(string.ascii_letters + string.digits, k=MAX_CUSTOM_ID_LENGTH)
     )
-    if db.session.query(URLMap).filter_by(custom_id=short).scalar():
+    if db.session.query(URLMap).filter_by(custom_id=custom_id).scalar():
         create_short()
     return custom_id
