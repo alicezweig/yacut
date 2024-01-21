@@ -1,3 +1,5 @@
 MAX_URL_LENTH = 2048
 MAX_CUSTOM_ID_LENGTH = 16
-YACUT_URL = 'http://yacut.ru/'
+AUTO_CUSTOM_ID_LENGTH = 6
+YACUT_URL = 'http://localhost/'
+CUSTOM_ID_REGEX = '^$|[0-9A-Za-z]*$'

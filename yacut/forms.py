@@ -1,12 +1,12 @@
 from flask_wtf import FlaskForm
-from wtforms import SubmitField, URLField
+from wtforms import SubmitField, URLField, StringField
 from wtforms.validators import URL, DataRequired, Length, Regexp
 
-from yacut.constants import MAX_CUSTOM_ID_LENGTH, MAX_URL_LENTH
+from yacut.constants import CUSTOM_ID_REGEX, MAX_CUSTOM_ID_LENGTH, MAX_URL_LENTH
 
 
 class URLForm(FlaskForm):
-    url = URLField(
+    original_link = URLField(
         'Длинная ссылка',
         validators=[
             DataRequired(message='Введите URL.'),
@@ -15,7 +15,7 @@ class URLForm(FlaskForm):
                 max=MAX_URL_LENTH,
                 message='Длина ссылки не может превышать %(max)d символов.')
         ])
-    custom_id = URLField(
+    custom_id = StringField(
         'Ваш вариант короткой ссылки',
         validators=[
             Length(
@@ -23,7 +23,7 @@ class URLForm(FlaskForm):
                 message='Длина ссылки не может превышать %(max)d символов.'
             ),
             Regexp(
-                regex='^$|[0-9A-Za-z]',
+                regex=CUSTOM_ID_REGEX,
                 message='Можно использовать только цифры и буквы латинского алфавита.'
             )
         ])
