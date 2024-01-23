@@ -1,42 +1,44 @@
-from flask import jsonify, request
+from http import HTTPStatus
 
-from yacut import app, db
+from flask import jsonify, request, url_for
+
+from yacut import app
 from yacut.error_handlers import InvalidRequest
-from yacut.constants import YACUT_URL
 from yacut.models import URLMap
-from yacut.create_short import create_short, get_urlmap, validate_short
+
+
+ERROR_MESSAGES = {
+    'not_found': 'Указанный id не найден',
+    'no_request_body': 'Отсутствует тело запроса',
+    'required_field': '\"url\" является обязательным полем!',
+}
 
 
 @app.route('/api/id/<short_id>/', methods=['GET'])
 def get_original_url(short_id):
-    url_map = get_urlmap(short_id)
+    url_map = URLMap.get_urlmap(short_id)
     if not url_map:
-        raise InvalidRequest('Указанный id не найден', 404)
+        raise InvalidRequest('Указанный id не найден', HTTPStatus.NOT_FOUND)
     return jsonify({'url': url_map.original})
 
 
 @app.route('/api/id/', methods=['POST'])
 def add_custom_id():
+    short_link = ''
     data = request.get_json()
     if not data:
-        raise InvalidRequest('Отсутствует тело запроса')
+        raise InvalidRequest(ERROR_MESSAGES['no_request_body'])
     if not data.get('url'):
-        raise InvalidRequest('\"url\" является обязательным полем!')
+        raise InvalidRequest(ERROR_MESSAGES['required_field'])
     custom_id = data.get('custom_id')
-    if not bool(custom_id):
-        custom_id = create_short()
-        data['custom_id'] = custom_id
-    else:
-        if not validate_short(custom_id):
-            raise InvalidRequest('Указано недопустимое имя для короткой ссылки')
-    if get_urlmap(custom_id):
-        raise InvalidRequest(
-            'Предложенный вариант короткой ссылки уже существует.'
+    try:
+        url_map = URLMap.create(
+            url=data.get('url'),
+            custom_id=custom_id
         )
-    url_map = URLMap()
-    url_map.from_dict(data)
-    db.session.add(url_map)
-    db.session.commit()
+        short_link = url_for('index', _external=True) + url_map.short
+    except Exception as error:
+        return jsonify({'message': str(error)}), HTTPStatus.BAD_REQUEST
     return jsonify(
-        {'url': url_map.original, 'short_link': YACUT_URL + custom_id}
-    ), 201
+        {'url': url_map.original, 'short_link': short_link}
+    ), HTTPStatus.CREATED

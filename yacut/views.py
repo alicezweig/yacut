@@ -1,37 +1,32 @@
-from flask import abort, Markup, flash, redirect, render_template
+from http import HTTPStatus
 
-from yacut import app, db
-from yacut.constants import YACUT_URL
-from yacut.create_short import create_short, get_urlmap
+from flask import abort, flash, redirect, render_template, url_for
+
+from yacut import app
 from yacut.forms import URLForm
 from yacut.models import URLMap
 
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
+    short_link = ''
     form = URLForm()
     if form.validate_on_submit():
-        original_link = form.original_link.data
+        url = form.original_link.data
         custom_id = form.custom_id.data
-        if get_urlmap(custom_id):
-            flash(u'Предложенный вариант короткой ссылки уже существует.')
-            return render_template('index.html', form=form)
-        if not custom_id:
-            custom_id = create_short()
-        db.session.add(URLMap(original=original_link, short=custom_id))
-        db.session.commit()
-        flash(
-            Markup(
-                f'Ваша короткая ссылка: <a href="{YACUT_URL}{custom_id}">'
-                f'{YACUT_URL}{custom_id}</a>'
-            )
-        )
-    return render_template('index.html', form=form)
+        try:
+            url_map = URLMap.create(url=url, custom_id=custom_id)
+            short_link = url_for('index', _external=True) + url_map.short
+        except Exception as error:
+            flash(str(error))
+    return render_template(
+        'index.html', form=form, context={'short_link': short_link}
+    )
 
 
 @app.route('/<custom_id>', methods=['GET'])
 def redirect_to_original(custom_id):
-    url_map = get_urlmap(custom_id)
+    url_map = URLMap.get_urlmap(custom_id)
     if url_map:
-        return redirect(url_map.original, code=302)
-    abort(404)
+        return redirect(url_map.original, code=HTTPStatus.FOUND)
+    abort(HTTPStatus.NOT_FOUND)
