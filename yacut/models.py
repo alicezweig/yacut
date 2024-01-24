@@ -57,7 +57,3 @@ class URLMap(db.Model):
             short=self.short,
             timestamp=self.timestamp,
         )
-
-    # def from_dict(self, data):
-    #     setattr(self, 'original', data['url'])
-    #     setattr(self, 'short', data['custom_id'])

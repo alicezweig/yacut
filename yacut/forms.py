@@ -11,9 +11,7 @@ MESSAGES = {
     'data_required_error_message': 'Введите URL.',
     'url_is_valid_error_message': 'Введите действительный URL адрес.',
     'length_error_message': 'Длина ссылки не может превышать %(max)d символов.',
-    'regex_error_message': (
-        'Можно использовать только цифры и буквы латинского алфавита.'
-    ),
+    'regex_error_message': 'Можно использовать только цифры и буквы латинского алфавита.',
     'create_button': 'Создать',
     'double_custom_id': 'Предложенный вариант короткой ссылки уже существует.'
 }

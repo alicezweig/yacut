@@ -6,7 +6,6 @@ from yacut import app
 from yacut.error_handlers import InvalidRequest
 from yacut.models import URLMap
 
-
 ERROR_MESSAGES = {
     'not_found': 'Указанный id не найден',
     'no_request_body': 'Отсутствует тело запроса',
@@ -18,7 +17,7 @@ ERROR_MESSAGES = {
 def get_original_url(short_id):
     url_map = URLMap.get_urlmap(short_id)
     if not url_map:
-        raise InvalidRequest('Указанный id не найден', HTTPStatus.NOT_FOUND)
+        raise InvalidRequest(ERROR_MESSAGES['not_found'], HTTPStatus.NOT_FOUND)
     return jsonify({'url': url_map.original})
 
 

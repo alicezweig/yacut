@@ -11,19 +11,19 @@ from yacut.models import URLMap
 def index():
     short_link = ''
     form = URLForm()
-    if form.validate_on_submit():
-        url = form.original_link.data
-        custom_id = form.custom_id.data
-        try:
-            url_map = URLMap.create(
-                url=url, custom_id=custom_id, is_data_valid=True
-            )
-            short_link = url_for('index', _external=True) + url_map.short
-        except Exception as error:
-            flash(str(error))
-    return render_template(
-        'index.html', form=form, context={'short_link': short_link}
-    )
+    if not form.validate_on_submit():
+        return render_template(
+            'index.html', form=form, context={'short_link': short_link}
+        )
+    url = form.original_link.data
+    custom_id = form.custom_id.data
+    try:
+        url_map = URLMap.create(
+            url=url, custom_id=custom_id, is_data_valid=True
+        )
+        short_link = url_for('index', _external=True) + url_map.short
+    except Exception as error:
+        flash(str(error))
 
 
 @app.route('/<custom_id>', methods=['GET'])
