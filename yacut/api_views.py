@@ -33,8 +33,7 @@ def add_custom_id():
     custom_id = data.get('custom_id')
     try:
         url_map = URLMap.create(
-            url=data.get('url'),
-            custom_id=custom_id
+            url=data.get('url'), custom_id=custom_id, is_data_valid=False
         )
         short_link = url_for('index', _external=True) + url_map.short
     except Exception as error:

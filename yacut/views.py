@@ -15,7 +15,9 @@ def index():
         url = form.original_link.data
         custom_id = form.custom_id.data
         try:
-            url_map = URLMap.create(url=url, custom_id=custom_id)
+            url_map = URLMap.create(
+                url=url, custom_id=custom_id, is_data_valid=True
+            )
             short_link = url_for('index', _external=True) + url_map.short
         except Exception as error:
             flash(str(error))

@@ -28,17 +28,18 @@ class URLMap(db.Model):
         return db.session.query(URLMap).filter_by(short=custom_id).first()
 
     @classmethod
-    def create(cls, url, custom_id):
+    def create(cls, url, custom_id=None, is_data_valid=False):
         if not bool(custom_id):
             for _ in range(GENERATE_SHORT_MAX_ATTEMPTS):
                 custom_id = ''.join(
                     choices(ALLOWED_CHARS, k=AUTO_CUSTOM_ID_LENGTH)
                 )
                 if not cls.get_urlmap(custom_id):
+                    is_data_valid = True
                     break
             else:
                 raise CollisionError(ERROR_MESSAGES['unable_to_create'])
-        else:
+        if not is_data_valid:
             if not (len(custom_id) <= MAX_CUSTOM_ID_LENGTH
                     and re.fullmatch(CUSTOM_ID_REGEX, custom_id)):
                 raise ValidationError(ERROR_MESSAGES['validation_error'])
