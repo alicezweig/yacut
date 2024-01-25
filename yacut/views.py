@@ -1,10 +1,12 @@
 from http import HTTPStatus
 
-from flask import abort, flash, redirect, render_template, url_for
+from flask import abort, redirect, render_template, url_for
 
 from yacut import app
 from yacut.forms import URLForm
 from yacut.models import URLMap
+
+GENERAL_ERROR_MESSAGE = 'Случилась ошибка: %s'
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -28,7 +30,7 @@ def index():
                     _external=True
                 )})
     except Exception as error:
-        flash(str(error))
+        app.logger.exception(GENERAL_ERROR_MESSAGE, error)
 
 
 @app.route('/<short>', methods=['GET'])
