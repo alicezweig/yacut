@@ -25,16 +25,9 @@
 ``` bash
     python3 -m venv venv
 ```
-
-* Если у вас Linux/macOS
-    ``` bash
-    source venv/bin/activate
-    ```
-
-* Если у вас windows
-    ``` bash
-    source venv/scripts/activate
-    ```
+``` bash
+source venv/bin/activate
+```
 
 ### Установить зависимости из файла requirements.txt:
 ``` bash
@@ -49,31 +42,15 @@ pip install -r requirements.txt
 touch .env && nano .env
 ```
 
+### Создать базу данных и применить миграции
+``` bash
+flask db upgrade
+```
+
 ### Запуск проекта
 ``` bash
 flask run
 ```
 
-### Создать базу данных
-``` bash
-flask shell
-```
-``` python
-from yacut import db
-```
-``` python
-db.create_all()
-```
-``` python
-exit()
-```
-### Создать и применить миграции
-``` bash
-flask db init
-```
-``` bash
- flask db migrate -m "initial"
-```
-
 ## API Yacut
-См. redoc.html
+См. [https://github.com/alicezweig/yacut/blob/master/redoc.html](redoc.html)

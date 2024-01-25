@@ -6,54 +6,57 @@ from wtforms.validators import ValidationError
 
 from yacut import db
 from yacut.error_handlers import CollisionError
-from yacut.settings import (ALLOWED_CHARS, AUTO_CUSTOM_ID_LENGTH,
-                            CUSTOM_ID_REGEX, GENERATE_SHORT_MAX_ATTEMPTS,
-                            MAX_CUSTOM_ID_LENGTH, MAX_URL_LENTH)
+from yacut.settings import (ALLOWED_CHARS, AUTO_SHORT_LENGTH,
+                            SHORT_REGEX, GENERATE_SHORT_MAX_ATTEMPTS,
+                            MAX_SHORT_LENGTH, MAX_ORIGINAL_LENGTH)
 
-ERROR_MESSAGES = {
-    'unable_to_create': 'Невозможно создать уникальный ID для короткой ссылки',
-    'double_short': 'Предложенный вариант короткой ссылки уже существует.',
-    'validation_error': 'Указано недопустимое имя для короткой ссылки',
-}
+
+UNABLE_TO_CREATE = 'Невозможно создать уникальный ID для короткой ссылки'
+DOUBLE_SHORT = 'Предложенный вариант короткой ссылки уже существует.'
+VALIDATION_SHORT_ERROR = 'Указано недопустимое имя для короткой ссылки'
+VALIDATION_ORIGINAL_ERROR = 'URL не может длинее чем {} символов'
 
 
 class URLMap(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    original = db.Column(db.String(MAX_URL_LENTH), nullable=False)
-    short = db.Column(db.String(MAX_CUSTOM_ID_LENGTH), nullable=False)
+    original = db.Column(db.String(MAX_ORIGINAL_LENGTH), nullable=False)
+    short = db.Column(db.String(MAX_SHORT_LENGTH), nullable=False)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
     @staticmethod
-    def get_urlmap(custom_id):
-        return db.session.query(URLMap).filter_by(short=custom_id).first()
+    def get(short):
+        return db.session.query(URLMap).filter_by(short=short).first()
 
     @classmethod
-    def create(cls, url, custom_id=None, is_data_valid=False):
-        if not bool(custom_id):
-            for _ in range(GENERATE_SHORT_MAX_ATTEMPTS):
-                custom_id = ''.join(
-                    choices(ALLOWED_CHARS, k=AUTO_CUSTOM_ID_LENGTH)
-                )
-                if not cls.get_urlmap(custom_id):
-                    is_data_valid = True
-                    break
-            else:
-                raise CollisionError(ERROR_MESSAGES['unable_to_create'])
+    def create_short(cls):
+        for _ in range(GENERATE_SHORT_MAX_ATTEMPTS):
+            short = ''.join(choices(ALLOWED_CHARS, k=AUTO_SHORT_LENGTH))
+            if not cls.get(short):
+                return short
+        raise CollisionError(UNABLE_TO_CREATE)
+
+    @classmethod
+    def create(cls, original, short=None, is_data_valid=False):
+        if not (is_data_valid or len(original) <= MAX_ORIGINAL_LENGTH):
+            raise ValidationError(
+                VALIDATION_ORIGINAL_ERROR.format(MAX_ORIGINAL_LENGTH)
+            )
+        if not short:
+            short = cls.create_short()
+            is_data_valid = True
         if not is_data_valid:
-            if not (len(custom_id) <= MAX_CUSTOM_ID_LENGTH
-                    and re.fullmatch(CUSTOM_ID_REGEX, custom_id)):
-                raise ValidationError(ERROR_MESSAGES['validation_error'])
-            if cls.get_urlmap(custom_id):
-                raise CollisionError(ERROR_MESSAGES['double_short'])
-        url_map = cls(original=url, short=custom_id)
+            if not (len(short) <= MAX_SHORT_LENGTH
+                    and re.fullmatch(SHORT_REGEX, short)):
+                raise ValidationError(VALIDATION_SHORT_ERROR)
+            if cls.get(short):
+                raise CollisionError(DOUBLE_SHORT)
+        url_map = cls(original=original, short=short)
         db.session.add(url_map)
         db.session.commit()
         return url_map
 
     def to_dict(self):
         return dict(
-            id=self.id,
             original=self.original,
             short=self.short,
-            timestamp=self.timestamp,
         )

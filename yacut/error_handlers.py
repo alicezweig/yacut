@@ -2,7 +2,7 @@ from http import HTTPStatus
 
 from flask import jsonify, render_template
 
-from yacut import app
+from yacut import app, db
 
 
 @app.errorhandler(HTTPStatus.NOT_FOUND)
@@ -11,7 +11,8 @@ def page_not_found(error):
 
 
 @app.errorhandler(HTTPStatus.INTERNAL_SERVER_ERROR)
-def page_not_found(error):
+def page_internal_server_error(error):
+    db.session.rollback()
     return render_template('500.html'), HTTPStatus.INTERNAL_SERVER_ERROR
 
 

@@ -12,24 +12,28 @@ def index():
     form = URLForm()
     if not form.validate_on_submit():
         return render_template('index.html', form=form)
-    url = form.original_link.data
-    custom_id = form.custom_id.data
+    original = form.original_link.data
+    short = form.custom_id.data
     try:
         url_map = URLMap.create(
-            url=url, custom_id=custom_id, is_data_valid=True
+            original=original, short=short, is_data_valid=True
         )
+        return render_template(
+            'index.html',
+            form=form,
+            context={
+                'short': url_for(
+                    endpoint='redirect_to_original',
+                    short=url_map.short,
+                    _external=True
+                )})
     except Exception as error:
         flash(str(error))
-    return render_template(
-        'index.html',
-        form=form,
-        context={'short': url_for('index', _external=True) + url_map.short}
-    )
 
 
-@app.route('/<custom_id>', methods=['GET'])
-def redirect_to_original(custom_id):
-    url_map = URLMap.get_urlmap(custom_id)
+@app.route('/<short>', methods=['GET'])
+def redirect_to_original(short):
+    url_map = URLMap.get(short)
     if url_map:
         return redirect(url_map.original, code=HTTPStatus.FOUND)
     abort(HTTPStatus.NOT_FOUND)

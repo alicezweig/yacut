@@ -1,47 +1,48 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, URLField
-from wtforms.validators import URL, DataRequired, Length, Optional, Regexp, ValidationError
+from wtforms.validators import (URL, DataRequired, Length, Optional, Regexp,
+                                ValidationError)
 
-from yacut.settings import CUSTOM_ID_REGEX, MAX_CUSTOM_ID_LENGTH, MAX_URL_LENTH
 from yacut.models import URLMap
+from yacut.settings import MAX_ORIGINAL_LENGTH, MAX_SHORT_LENGTH, SHORT_REGEX
 
-MESSAGES = {
-    'long_url': 'Длинная ссылка',
-    'short_id': 'Ваш вариант короткой ссылки',
-    'data_required_error_message': 'Введите URL.',
-    'url_is_valid_error_message': 'Введите действительный URL адрес.',
-    'length_error_message': 'Длина ссылки не может превышать %(max)d символов.',
-    'regex_error_message': 'Можно использовать только цифры и буквы латинского алфавита.',
-    'create_button': 'Создать',
-    'double_custom_id': 'Предложенный вариант короткой ссылки уже существует.'
-}
+LONG_URL = 'Длинная ссылка'
+SHORT = 'Ваш вариант короткой ссылки'
+DATA_REQUIRED_ERROR_MESSAGE = 'Введите URL.'
+URL_IS_VALID_ERROR_MESSAGE = 'Введите действительный URL адрес.'
+LENGTH_ERROR_MESSAGE = 'Длина ссылки не может превышать %(max)d символов.'
+REGEX_ERROR_MESSAGE = (
+    'Можно использовать только цифры и буквы латинского алфавита.'
+)
+CREATE_BUTTON = 'Создать'
+DOUBLE_SHORT = 'Предложенный вариант короткой ссылки уже существует.'
 
 
 class URLForm(FlaskForm):
     original_link = URLField(
-        MESSAGES['long_url'],
+        LONG_URL,
         validators=[
-            DataRequired(message=MESSAGES['data_required_error_message']),
-            URL(message=MESSAGES['url_is_valid_error_message']),
+            DataRequired(message=DATA_REQUIRED_ERROR_MESSAGE),
+            URL(message=URL_IS_VALID_ERROR_MESSAGE),
             Length(
-                max=MAX_URL_LENTH,
-                message=MESSAGES['length_error_message'])
+                max=MAX_ORIGINAL_LENGTH,
+                message=LENGTH_ERROR_MESSAGE)
         ])
     custom_id = StringField(
-        MESSAGES['short_id'],
+        SHORT,
         validators=[
             Optional(strip_whitespace=False),
             Length(
-                max=MAX_CUSTOM_ID_LENGTH,
-                message=MESSAGES['length_error_message']
+                max=MAX_SHORT_LENGTH,
+                message=LENGTH_ERROR_MESSAGE
             ),
             Regexp(
-                regex=CUSTOM_ID_REGEX,
-                message=MESSAGES['regex_error_message']
+                regex=SHORT_REGEX,
+                message=REGEX_ERROR_MESSAGE
             )
         ])
-    submit = SubmitField(MESSAGES['create_button'])
+    submit = SubmitField(CREATE_BUTTON)
 
-    def validate_custom_id(self, custom_id):
-        if URLMap.get_urlmap(custom_id.data):
-            raise ValidationError(MESSAGES['double_custom_id'])
+    def validate_custom_id(self, short):
+        if URLMap.get(short.data):
+            raise ValidationError(DOUBLE_SHORT)
