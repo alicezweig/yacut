@@ -55,3 +55,4 @@ flask run
 ### API Yacut
 [Документация](https://petstore.swagger.io/?url=https://github.com/alicezweig/yacut/blob/master/redoc.html)
 
+После запуска проект документация доступна по адресу http://localhost/docs
