@@ -11,10 +11,10 @@ from yacut.settings import (ALLOWED_CHARS, AUTO_SHORT_LENGTH,
                             MAX_SHORT_LENGTH, MAX_ORIGINAL_LENGTH)
 
 
-UNABLE_TO_CREATE = 'Невозможно создать уникальный ID для короткой ссылки'
 DOUBLE_SHORT = 'Предложенный вариант короткой ссылки уже существует.'
-VALIDATION_SHORT_ERROR = 'Указано недопустимое имя для короткой ссылки'
+UNABLE_TO_CREATE = 'Невозможно создать уникальный ID для короткой ссылки'
 VALIDATION_ORIGINAL_ERROR = 'URL не может длинее чем {} символов'
+VALIDATION_SHORT_ERROR = 'Указано недопустимое имя для короткой ссылки'
 
 
 class URLMap(db.Model):

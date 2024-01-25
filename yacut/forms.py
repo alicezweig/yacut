@@ -6,16 +6,16 @@ from wtforms.validators import (URL, DataRequired, Length, Optional, Regexp,
 from yacut.models import URLMap
 from yacut.settings import MAX_ORIGINAL_LENGTH, MAX_SHORT_LENGTH, SHORT_REGEX
 
-LONG_URL = 'Длинная ссылка'
-SHORT = 'Ваш вариант короткой ссылки'
+CREATE_BUTTON = 'Создать'
 DATA_REQUIRED_ERROR_MESSAGE = 'Введите URL.'
-URL_IS_VALID_ERROR_MESSAGE = 'Введите действительный URL адрес.'
+DOUBLE_SHORT = 'Предложенный вариант короткой ссылки уже существует.'
 LENGTH_ERROR_MESSAGE = 'Длина ссылки не может превышать %(max)d символов.'
+LONG_URL = 'Длинная ссылка'
 REGEX_ERROR_MESSAGE = (
     'Можно использовать только цифры и буквы латинского алфавита.'
 )
-CREATE_BUTTON = 'Создать'
-DOUBLE_SHORT = 'Предложенный вариант короткой ссылки уже существует.'
+SHORT = 'Ваш вариант короткой ссылки'
+URL_IS_VALID_ERROR_MESSAGE = 'Введите действительный URL адрес.'
 
 
 class URLForm(FlaskForm):
