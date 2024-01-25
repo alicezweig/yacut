@@ -53,5 +53,5 @@ flask run
 ```
 
 ### API Yacut
-[Документация](https://petstore.swagger.io/?url=https://github.com/alicezweig/yacut/blob/master/redoc.html)
+[Документация](https://petstore.swagger.io/?url=https://github.com/alicezweig/yacut/blob/master/redoc.yaml)
 
