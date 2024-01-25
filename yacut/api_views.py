@@ -1,11 +1,11 @@
 from http import HTTPStatus
 
-from flask import jsonify, url_for, request
+from flask import jsonify, request, url_for
 
 from yacut import app
 from yacut.error_handlers import InvalidRequest
 from yacut.models import URLMap
-
+from yacut.settings import REDIRECT_URL_NAME
 
 NOT_FOUND = 'Указанный id не найден'
 NO_REQUEST_BODY = 'Отсутствует тело запроса'
@@ -29,18 +29,18 @@ def add_short():
         raise InvalidRequest(REQUIRED_FIELD)
     short = data.get('custom_id')
     try:
-        url_map = URLMap.create(
-            original=data.get('url'), short=short, is_data_valid=False
-        )
+        return jsonify(
+            {
+                'url': data['url'],
+                'short_link': url_for(
+                    REDIRECT_URL_NAME,
+                    short=URLMap.create(
+                        original=data['url'],
+                        short=short,
+                        is_data_valid=False
+                    ).short,
+                    _external=True
+                )}
+        ), HTTPStatus.CREATED
     except Exception as error:
-        return jsonify({'message': str(error)}), HTTPStatus.BAD_REQUEST
-    return jsonify(
-        {
-            'url': url_map.original,
-            'short_link': url_for(
-                'redirect_to_original',
-                short=url_map.short,
-                _external=True
-            )
-        }
-    ), HTTPStatus.CREATED
+        raise InvalidRequest(str(error))

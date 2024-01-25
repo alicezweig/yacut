@@ -27,30 +27,30 @@ class URLMap(db.Model):
     def get(short):
         return db.session.query(URLMap).filter_by(short=short).first()
 
-    @classmethod
-    def create_short(cls):
+    @staticmethod
+    def create_short():
         for _ in range(GENERATE_SHORT_MAX_ATTEMPTS):
             short = ''.join(choices(ALLOWED_CHARS, k=AUTO_SHORT_LENGTH))
-            if not cls.get(short):
+            if not URLMap.get(short):
                 return short
         raise CollisionError(UNABLE_TO_CREATE)
 
-    @classmethod
-    def create(cls, original, short=None, is_data_valid=False):
+    @staticmethod
+    def create(original, short=None, is_data_valid=False):
         if not (is_data_valid or len(original) <= MAX_ORIGINAL_LENGTH):
             raise ValidationError(
                 VALIDATION_ORIGINAL_ERROR.format(MAX_ORIGINAL_LENGTH)
             )
         if not short:
-            short = cls.create_short()
+            short = URLMap.create_short()
             is_data_valid = True
         if not is_data_valid:
             if not (len(short) <= MAX_SHORT_LENGTH
                     and re.fullmatch(SHORT_REGEX, short)):
                 raise ValidationError(VALIDATION_SHORT_ERROR)
-            if cls.get(short):
+            if URLMap.get(short):
                 raise CollisionError(DOUBLE_SHORT)
-        url_map = cls(original=original, short=short)
+        url_map = URLMap(original=original, short=short)
         db.session.add(url_map)
         db.session.commit()
         return url_map

@@ -1,12 +1,13 @@
 from http import HTTPStatus
 
-from flask import abort, redirect, render_template, url_for
+from flask import abort, flash, redirect, render_template, url_for
 
 from yacut import app
 from yacut.forms import URLForm
 from yacut.models import URLMap
+from yacut.settings import REDIRECT_URL_NAME
 
-GENERAL_ERROR_MESSAGE = 'Случилась ошибка: %s'
+GENERAL_ERROR = 'Случилась ошибка: %s'
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -17,20 +18,22 @@ def index():
     original = form.original_link.data
     short = form.custom_id.data
     try:
-        url_map = URLMap.create(
-            original=original, short=short, is_data_valid=True
-        )
         return render_template(
             'index.html',
             form=form,
             context={
                 'short': url_for(
-                    endpoint='redirect_to_original',
-                    short=url_map.short,
+                    endpoint=REDIRECT_URL_NAME,
+                    short=URLMap.create(
+                        original=original,
+                        short=short,
+                        is_data_valid=True
+                    ).short,
                     _external=True
                 )})
     except Exception as error:
-        app.logger.exception(GENERAL_ERROR_MESSAGE, error)
+        flash(str(error))
+        app.logger.exception(GENERAL_ERROR, error)
 
 
 @app.route('/<short>', methods=['GET'])

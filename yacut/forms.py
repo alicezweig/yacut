@@ -7,26 +7,26 @@ from yacut.models import URLMap
 from yacut.settings import MAX_ORIGINAL_LENGTH, MAX_SHORT_LENGTH, SHORT_REGEX
 
 CREATE_BUTTON = 'Создать'
-DATA_REQUIRED_ERROR_MESSAGE = 'Введите URL.'
+DATA_REQUIRED_ERROR = 'Введите URL.'
 DOUBLE_SHORT = 'Предложенный вариант короткой ссылки уже существует.'
-LENGTH_ERROR_MESSAGE = 'Длина ссылки не может превышать %(max)d символов.'
+LENGTH_ERROR = 'Длина ссылки не может превышать %(max)d символов.'
 LONG_URL = 'Длинная ссылка'
-REGEX_ERROR_MESSAGE = (
+REGEX_ERROR = (
     'Можно использовать только цифры и буквы латинского алфавита.'
 )
 SHORT = 'Ваш вариант короткой ссылки'
-URL_IS_VALID_ERROR_MESSAGE = 'Введите действительный URL адрес.'
+URL_IS_VALID_ERROR = 'Введите действительный URL адрес.'
 
 
 class URLForm(FlaskForm):
     original_link = URLField(
         LONG_URL,
         validators=[
-            DataRequired(message=DATA_REQUIRED_ERROR_MESSAGE),
-            URL(message=URL_IS_VALID_ERROR_MESSAGE),
+            DataRequired(message=DATA_REQUIRED_ERROR),
+            URL(message=URL_IS_VALID_ERROR),
             Length(
                 max=MAX_ORIGINAL_LENGTH,
-                message=LENGTH_ERROR_MESSAGE)
+                message=LENGTH_ERROR)
         ])
     custom_id = StringField(
         SHORT,
@@ -34,11 +34,11 @@ class URLForm(FlaskForm):
             Optional(strip_whitespace=False),
             Length(
                 max=MAX_SHORT_LENGTH,
-                message=LENGTH_ERROR_MESSAGE
+                message=LENGTH_ERROR
             ),
             Regexp(
                 regex=SHORT_REGEX,
-                message=REGEX_ERROR_MESSAGE
+                message=REGEX_ERROR
             )
         ])
     submit = SubmitField(CREATE_BUTTON)

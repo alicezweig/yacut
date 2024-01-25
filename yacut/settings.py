@@ -13,3 +13,5 @@ MAX_SHORT_LENGTH = 16
 
 ALLOWED_CHARS = string.ascii_letters + string.digits
 SHORT_REGEX = fr'^[{ALLOWED_CHARS}]*$'
+
+REDIRECT_URL_NAME = 'redirect_to_original'
