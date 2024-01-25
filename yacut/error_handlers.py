@@ -31,6 +31,7 @@ class InvalidRequest(Exception):
 
 @app.errorhandler(InvalidRequest)
 def invalid_request(error):
+    db.session.rollback()
     return jsonify(error.to_dict()), error.status_code
 
 

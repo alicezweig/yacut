@@ -10,7 +10,7 @@
             <p>
                 {% with messages = get_flashed_messages() %}
                   {% for message in messages %}
-                  <h5 class="text-center">{{ message }}</h5>
+                  <h5>Что произошло: {{ message }}</h5>
                   {% endfor %}
                 {% endwith %}
             </p>

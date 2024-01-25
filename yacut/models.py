@@ -13,7 +13,7 @@ from yacut.settings import (ALLOWED_CHARS, AUTO_SHORT_LENGTH,
 
 DOUBLE_SHORT = 'Предложенный вариант короткой ссылки уже существует.'
 UNABLE_TO_CREATE = 'Невозможно создать уникальный ID для короткой ссылки'
-VALIDATION_ORIGINAL_ERROR = 'URL не может длинее чем %d символов'
+VALIDATION_ORIGINAL_ERROR = 'URL не может длинее чем {} символов'
 VALIDATION_SHORT_ERROR = 'Указано недопустимое имя для короткой ссылки'
 
 

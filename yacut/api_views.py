@@ -1,12 +1,14 @@
 from http import HTTPStatus
 
 from flask import jsonify, request, url_for
+from wtforms.validators import ValidationError
 
 from yacut import app
-from yacut.error_handlers import InvalidRequest
+from yacut.error_handlers import InvalidRequest, CollisionError
 from yacut.models import URLMap
 from yacut.settings import REDIRECT_URL_NAME
 
+GENERAL_ERROR = 'Случилась ошибка: %s'
 NOT_FOUND = 'Указанный id не найден'
 NO_REQUEST_BODY = 'Отсутствует тело запроса'
 REQUIRED_FIELD = '"url" является обязательным полем!'
@@ -42,5 +44,8 @@ def add_short():
                     _external=True
                 )}
         ), HTTPStatus.CREATED
-    except Exception as error:
+    except (CollisionError, ValidationError) as error:
         raise InvalidRequest(str(error))
+    except Exception as error:
+        app.logger.exception(GENERAL_ERROR, error)
+        raise InvalidRequest(str(error), 500)
