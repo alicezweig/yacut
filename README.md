@@ -52,5 +52,6 @@ flask db upgrade
 flask run
 ```
 
-## API Yacut
-См. [https://github.com/alicezweig/yacut/blob/master/redoc.html](redoc.html)
+### API Yacut
+[Документация](https://petstore.swagger.io/?url=https://github.com/alicezweig/yacut/blob/master/redoc.html)
+
